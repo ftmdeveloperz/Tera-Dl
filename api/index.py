@@ -168,7 +168,7 @@ async def format_message(link_data):
 @app.route('/')
 def hello_world():
   #result = bot.get_me()
-  response = {'status': 'success', 'message': 'Working Fully',' Contact': '@Devil_0p || @GuyXD'}
+  response = {'status': 'success', 'message': 'Working Fully',' Contact': '@ftmdeveloperz || @ftmdeveloperr'}
   return response
 
 
