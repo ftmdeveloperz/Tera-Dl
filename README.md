@@ -1,1 +1,1 @@
-# Tera-Dl
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDEVIL-X-0P%2FTeraBox-Direct-Downloader&demo-title=TeraBox%20Direct%20Downloader&demo-description=Deploy%20your%20TeraBox%20Direct%20Downloader%20on%20Vercel&demo-url=https%3A%2F%2Fteraboxx.vercel.app&demo-image=https://your-image-url-here.png)
