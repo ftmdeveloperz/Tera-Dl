@@ -2,37 +2,11 @@ from flask import Flask, request, jsonify
 import os
 import aiohttp
 import asyncio
-import logging
 from urllib.parse import parse_qs, urlparse
+from api.logger import logger  # Import custom logger
+from api.config import cookies, headers
 
 app = Flask(__name__)
-
-# Replace with your working cookies
-cookies = {
-    'PANWEB': '1',
-    'browserid': 'p4nVrnlkUVKcnbbJHnIClAhSL5uXs01e-0svx0bm7KHLUB6wIVvCUNGLIpU=',
-    'lang': 'en',
-    '__bid_n': '1900b9f02442253dfe4207',
-    'ndut_fmt': 'BE5EF02E4FBDA93F542338752E051A84DEF30C5E3CBBF98408453BFE5D65FFE4',
-    '__stripe_mid': 'b85d61d2-4812-4eeb-8e41-b1efb3fa2a002a54d5',
-    'csrfToken': 'xknOoriwpXbwXMVswJ7kv1M7',
-    '__stripe_sid': 'e8fd1495-017f-4f05-949c-7cb3a1c780fed92613',
-    'ndus': 'YylKpiCteHuiYEqq8n75Tb-JhCqmg0g4YMH03MYD',
-}
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Connection': 'keep-alive',
-    'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'none',
-    'Sec-Fetch-User': '?1',
-    'Priority': 'u=0, i',
-}
-
 
 def find_between(string, start, end):
     start_index = string.find(start) + len(start)
@@ -93,7 +67,7 @@ async def fetch_download_link_async(url):
 
                     return response_data2['list']
     except aiohttp.ClientResponseError as e:
-        print(f"Error fetching download link: {e}")
+        logger.error(f"Error fetching download link: {e}")
         return None
 
 
@@ -117,7 +91,7 @@ async def get_formatted_size_async(size_bytes):
         unit = "MB" if size_bytes >= 1024 * 1024 else ("KB" if size_bytes >= 1024 else "bytes")
         return f"{size:.2f} {unit}"
     except Exception as e:
-        print(f"Error getting formatted size: {e}")
+        logger.error(f"Error getting formatted size: {e}")
         return None
 
 
@@ -142,6 +116,7 @@ async def format_message(link_data):
 
 @app.route('/')
 def home():
+    logger.info('Home page accessed')
     return {
         'status': 'success',
         'message': 'Working Fully',
@@ -151,6 +126,7 @@ def home():
 
 @app.route('/help', methods=['GET'])
 async def help():
+    logger.info('Help page accessed')
     return {
         'Info': 'Use the API like this:',
         'Example': 'https://yourdomain.com/api?link=https://1024terabox.com/s/example'
@@ -160,12 +136,12 @@ async def help():
 @app.route('/api', methods=['GET'])
 async def api():
     try:
-        # Accept both `link` and `url`
         url = request.args.get('link') or request.args.get('url')
         if not url:
+            logger.warning('No link or url parameter provided')
             return jsonify({'status': 'error', 'message': 'No link or url parameter provided', 'Link': None})
 
-        logging.info(f"Received request for URL: {url}")
+        logger.info(f"Received request for URL: {url}")
         link_data = await fetch_download_link_async(url)
 
         if link_data:
@@ -174,6 +150,7 @@ async def api():
         else:
             formatted_message = None
 
+        logger.info(f"Returning response for URL: {url}")
         return jsonify({
             'ShortLink': url,
             'Extracted Info': formatted_message,
@@ -181,7 +158,7 @@ async def api():
         })
 
     except Exception as e:
-        logging.error(f"Error occurred: {e}")
+        logger.error(f"Error occurred: {e}")
         return jsonify({
             'status': 'error',
             'message': str(e),
