@@ -2,7 +2,7 @@ import logging
 import os
 
 # Check if the environment is Lambda or similar, or use a local temporary directory
-log_dir = '/tmp'  # Writable location for Lambda, or choose another location for your environment
+log_dir = '/logs'  # Writable location for Lambda, or choose another location for your environment
 log_file_path = os.path.join(log_dir, 'api.log')
 
 # Create a logger instance
